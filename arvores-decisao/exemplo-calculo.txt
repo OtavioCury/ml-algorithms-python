@@ -1,0 +1,277 @@
+Título: Exemplo simples de ganho de informação em árvore de decisão
+
+Descrição:
+Vamos usar um conjunto bem pequeno, com 8 exemplos, 3 atributos e uma classe binária (Sim/Não).
+Vamos calcular:
+- Entropia inicial do conjunto
+- Ganho de informação de dois atributos
+- Explicar por que um atributo é melhor que o outro
+
+--------------------------------------------------
+1. Conjunto de dados
+--------------------------------------------------
+
+Atributos:
+- Clima: {Ensolarado, Nublado, Chuvoso}
+- Temperatura: {Alta, Média}
+- Vento: {Fraco, Forte}
+- Classe (Alvo): Jogar = {Sim, Não}
+
+Tabela de dados (8 exemplos):
+
+ID | Clima     | Temperatura | Vento  | Jogar
+---|-----------|-------------|--------|------
+1  | Ensolarado| Alta        | Fraco  | Não
+2  | Ensolarado| Alta        | Forte  | Não
+3  | Nublado   | Alta        | Fraco  | Sim
+4  | Chuvoso   | Média       | Fraco  | Sim
+5  | Chuvoso   | Fraco       | Forte  | Não
+6  | Chuvoso   | Forte       | Fraco  | Sim
+7  | Nublado   | Média       | Forte  | Sim
+8  | Nublado   | Média       | Fraco  | Sim
+
+Contagem da classe:
+- Jogar = Sim: 5 exemplos (IDs 3, 4, 6, 7, 8)
+- Jogar = Não: 3 exemplos (IDs 1, 2, 5)
+
+--------------------------------------------------
+2. Entropia inicial do conjunto
+--------------------------------------------------
+
+Proporções:
+- p(Sim) = 5/8
+- p(Não) = 3/8
+
+Entropia H(S):
+
+H(S) = - [ p(Sim) * log2(p(Sim)) + p(Não) * log2(p(Não)) ]
+
+Vamos aproximar:
+
+p(Sim) = 5/8 = 0,625
+p(Não) = 3/8 = 0,375
+
+log2(0,625) ≈ -0,678
+log2(0,375) ≈ -1,415
+
+Então:
+
+H(S) ≈ - [ 0,625 * (-0,678) + 0,375 * (-1,415) ]
+     ≈ - [ -0,42375 + -0,530625 ]
+     ≈ - [ -0,954375 ]
+     ≈ 0,95 bits (aprox.)
+
+Interpretação:
+- O conjunto está “meio misturado”: não é totalmente puro, nem totalmente bagunçado.
+- Temos uma incerteza de ~0,95 bits sobre a classe Jogar.
+
+--------------------------------------------------
+3. Ganho de informação do atributo "Clima"
+--------------------------------------------------
+
+Valores possíveis de Clima:
+- Ensolarado
+- Nublado
+- Chuvoso
+
+Vamos separar o conjunto por Clima.
+
+3.1. Subconjunto Clima = Ensolarado
+
+Exemplos:
+- ID 1: Jogar = Não
+- ID 2: Jogar = Não
+
+Contagem:
+- Sim: 0
+- Não: 2
+
+Proporções:
+- p(Sim) = 0
+- p(Não) = 1
+
+Entropia:
+
+H(Ensolarado) = - [ 0 * log2(0) + 1 * log2(1) ]
+               = - [ 0 + 1 * 0 ]
+               = 0
+
+(Conjunto totalmente puro: sempre Não.)
+
+3.2. Subconjunto Clima = Nublado
+
+Exemplos:
+- ID 3: Sim
+- ID 7: Sim
+- ID 8: Sim
+
+Contagem:
+- Sim: 3
+- Não: 0
+
+Proporções:
+- p(Sim) = 1
+- p(Não) = 0
+
+Entropia:
+
+H(Nublado) = - [ 1 * log2(1) + 0 * log2(0) ]
+            = - [ 0 + 0 ]
+            = 0
+
+(Também totalmente puro: sempre Sim.)
+
+3.3. Subconjunto Clima = Chuvoso
+
+Exemplos:
+- ID 4: Sim
+- ID 5: Não
+- ID 6: Sim
+
+Contagem:
+- Sim: 2
+- Não: 1
+
+Proporções:
+- p(Sim) = 2/3 ≈ 0,667
+- p(Não) = 1/3 ≈ 0,333
+
+log2(0,667) ≈ -0,585
+log2(0,333) ≈ -1,585
+
+H(Chuvoso) ≈ - [ 0,667 * (-0,585) + 0,333 * (-1,585) ]
+           ≈ - [ -0,390 + -0,528 ]
+           ≈ - [ -0,918 ]
+           ≈ 0,92 bits (aprox.)
+
+3.4. Entropia após dividir por Clima
+
+Pesos (proporção de cada subconjunto no total):
+
+- |Ensolarado| = 2 → 2/8 = 0,25
+- |Nublado|   = 3 → 3/8 = 0,375
+- |Chuvoso|   = 3 → 3/8 = 0,375
+
+Entropia média:
+
+H(S | Clima) = 0,25 * H(Ensolarado)
+             + 0,375 * H(Nublado)
+             + 0,375 * H(Chuvoso)
+
+H(S | Clima) ≈ 0,25 * 0 + 0,375 * 0 + 0,375 * 0,92
+             ≈ 0 + 0 + 0,345
+             ≈ 0,35 bits (aprox.)
+
+3.5. Ganho de informação de Clima
+
+IG(S, Clima) = H(S) - H(S | Clima)
+             ≈ 0,95 - 0,35
+             ≈ 0,60 bits
+
+Interpretação:
+- Dividir por Clima reduz bastante a bagunça.
+- Dois subconjuntos ficam totalmente puros (Ensolarado = sempre Não, Nublado = sempre Sim).
+- Só Chuvoso ainda tem mistura.
+- Ganho de informação é alto: 0,60.
+
+--------------------------------------------------
+4. Ganho de informação do atributo "Vento"
+--------------------------------------------------
+
+Valores possíveis de Vento:
+- Fraco
+- Forte
+
+4.1. Subconjunto Vento = Fraco
+
+Exemplos:
+- ID 1: Não
+- ID 3: Sim
+- ID 4: Sim
+- ID 6: Sim
+- ID 8: Sim
+
+Contagem:
+- Sim: 4
+- Não: 1
+
+Proporções:
+- p(Sim) = 4/5 = 0,8
+- p(Não) = 1/5 = 0,2
+
+log2(0,8) ≈ -0,322
+log2(0,2) ≈ -2,322
+
+H(Fraco) ≈ - [ 0,8 * (-0,322) + 0,2 * (-2,322) ]
+         ≈ - [ -0,2576 + -0,4644 ]
+         ≈ - [ -0,722 ]
+         ≈ 0,72 bits (aprox.)
+
+4.2. Subconjunto Vento = Forte
+
+Exemplos:
+- ID 2: Não
+- ID 5: Não
+- ID 7: Sim
+
+Contagem:
+- Sim: 1
+- Não: 2
+
+Proporções:
+- p(Sim) = 1/3 ≈ 0,333
+- p(Não) = 2/3 ≈ 0,667
+
+log2(0,333) ≈ -1,585
+log2(0,667) ≈ -0,585
+
+H(Forte) ≈ - [ 0,333 * (-1,585) + 0,667 * (-0,585) ]
+         ≈ - [ -0,528 + -0,390 ]
+         ≈ - [ -0,918 ]
+         ≈ 0,92 bits (aprox.)
+
+4.3. Entropia após dividir por Vento
+
+Pesos:
+
+- |Fraco| = 5 → 5/8 = 0,625
+- |Forte| = 3 → 3/8 = 0,375
+
+H(S | Vento) = 0,625 * H(Fraco) + 0,375 * H(Forte)
+             ≈ 0,625 * 0,72 + 0,375 * 0,92
+             ≈ 0,45 + 0,345
+             ≈ 0,80 bits (aprox.)
+
+4.4. Ganho de informação de Vento
+
+IG(S, Vento) = H(S) - H(S | Vento)
+             ≈ 0,95 - 0,80
+             ≈ 0,15 bits
+
+Interpretação:
+- Dividir por Vento reduz pouco a bagunça.
+- Os subconjuntos ainda têm mistura significativa de Sim e Não.
+- Ganho de informação é bem menor que o de Clima.
+
+--------------------------------------------------
+5. Comparação e explicação final
+--------------------------------------------------
+
+Ganho de informação:
+- IG(S, Clima) ≈ 0,60 bits
+- IG(S, Vento) ≈ 0,15 bits
+
+Conclusão:
+- O atributo Clima é muito melhor para a primeira divisão da árvore.
+- Ele cria subconjuntos bem mais puros:
+  - Ensolarado → sempre Não
+  - Nublado → sempre Sim
+  - Chuvoso → ainda misto, mas com maioria Sim
+- Já Vento deixa os dois lados ainda bem misturados.
+
+Intuição:
+- Entropia mede quanta incerteza existe sobre a classe.
+- Ganho de informação mede o quanto essa incerteza cai depois da divisão.
+- A árvore escolhe o atributo com maior ganho de informação porque ele é o que mais “explica” a classe.
+
+Fim do arquivo.
