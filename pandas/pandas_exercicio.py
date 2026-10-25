@@ -1,7 +1,8 @@
 import pandas as pd
 #carregando o dataset corretamente
-data = pd.read_csv("C:\\Users\\otavi\\OneDrive\\ufpi\\estudos\\engenharia\\ml-algorithms-python\\pandas\\datasets\\GasPricesinBrazil_2004-2019.csv", sep=";")
+data = pd.read_csv("/home/otavio/ml-algorithms-python/pandas/datasets/GasPricesinBrazil_2004-2019.csv", sep=";")
 print(data.head(10))
+#Imprimindo informações sobre o dataset
 print(data.info())
 print(type(data))
 print(data.shape)
@@ -129,7 +130,7 @@ del data["COLUNA A PARTIR DE LISTA"]
 del data["PREÇO MÉDIO REVENDA (dólares)"]
 print("Colunas após remoção:\n", list(data.columns))
 
-data.to_csv("C:\\Users\\otavi\\OneDrive\\ufpi\\estudos\\engenharia\\ml-algorithms-python\\pandas\\datasets\\GasPricesinBrazil_2004-2019_modificado.csv", index=False)
+data.to_csv("/home/otavio/ml-algorithms-python/pandas/datasets/GasPricesinBrazil_2004-2019_modificado.csv", index=False)
 
 #Mostra todos os estado sem repetição
 print("Estados do dataset: ",data["ESTADO"].unique())
@@ -167,6 +168,15 @@ print("Dados do anos de 2008, 2010, 2012: ", data[selecao_anos].head())
 #Selecionando registros do anos de 2008, 2010, 2012 usando query
 print("Dados do anos de 2008, 2010, 2012 usando query: ", data.query("ANO in @lista_anos").head())
 
-#Usando iterrows
-for index, row in data.head(20).iterrow():
-    print(f"índice {index}, linha {row}")
+#Fazendo limpeza nos dados
+data_pre = data.copy()
+data_pre["DATA INICIAL"] = pd.to_datetime(data_pre["DATA INICIAL"])
+data_pre["DATA FINAL"] = pd.to_datetime(data_pre["DATA FINAL"])
+print("Informações do banco: ", data_pre.info())
+
+# convertendo atributos/colunas para 'numeric'
+for atributo in ['MARGEM MÉDIA REVENDA', 'PREÇO MÉDIO DISTRIBUIÇÃO', 'DESVIO PADRÃO DISTRIBUIÇÃO', 
+                 'PREÇO MÍNIMO DISTRIBUIÇÃO', 'PREÇO MÁXIMO DISTRIBUIÇÃO', 'COEF DE VARIAÇÃO DISTRIBUIÇÃO']:
+    data_pre[atributo] = pd.to_numeric(data_pre[atributo], errors="coerce")
+
+data_pre.info()
