@@ -180,3 +180,20 @@ for atributo in ['MARGEM MÉDIA REVENDA', 'PREÇO MÉDIO DISTRIBUIÇÃO', 'DESVI
     data_pre[atributo] = pd.to_numeric(data_pre[atributo], errors="coerce")
 
 data_pre.info()
+
+# preenchendo o valores NaN com um valor padrão
+data_pre_fill = data_pre.fillna(0)
+print("Informações do banco após preenchimento de NaN com 0: ", data_pre_fill.info())
+
+#especificando valores para preencher os valores NaN
+data_pre_fill = data_pre.fillna(value={
+    "PREÇO MÉDIO DISTRIBUIÇÃO": 10,
+    "DESVIO PADRÃO DISTRIBUIÇÃO": 20,
+    "PREÇO MÍNIMO DISTRIBUIÇÃO": 30,
+    "PREÇO MÁXIMO DISTRIBUIÇÃO": "VAZIO",
+})
+print("Informações do banco após preenchimento de NaN com valores específicos: ", data_pre_fill.info())
+
+# fazendo um drop de linhas com valores NaN
+data_pre.dropna(inplace=True)
+print("Informações do banco após remoção de linhas com NaN: ", data_pre.info())
